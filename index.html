@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sutar Tech — member pages</title>
+<link rel="preconnect" href="https://script.google.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,400;6..72,500&display=swap" rel="stylesheet">
+<style>
+  html,body{margin:0;padding:0;background:#FBF7F1}
+  body{font-family:"Helvetica Neue",Helvetica,Arial,sans-serif;color:#221E1A;-webkit-font-smoothing:antialiased}
+  *{box-sizing:border-box}
+  a{color:#5B3FB8;text-decoration:none}
+  a:hover{color:#4A31A0}
+  .wrap{max-width:720px;margin:0 auto;padding:64px 24px 80px}
+  h1{font-family:Newsreader,Georgia,serif;font-weight:500;font-size:38px;line-height:1.12;letter-spacing:-0.02em;margin:0 0 10px}
+  p.lede{font-size:16px;line-height:1.65;color:#5C544B;margin:0 0 34px;max-width:34em}
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px}
+  .card{display:block;border:1px solid #E8DFD1;background:#fff;border-radius:16px;padding:18px;transition:border-color .16s ease,transform .16s ease}
+  .card:hover{border-color:#5B3FB8;transform:translateY(-2px)}
+  .card b{display:block;font-size:15px;margin-bottom:3px;color:#221E1A}
+  .card span{font-size:12.5px;color:#6B6157}
+  .mono{font-family:ui-monospace,monospace;font-size:12px;color:#5B3FB8}
+  footer{margin-top:44px;padding-top:20px;border-top:1px solid #E8DFD1;font-size:13px;color:#6B6157}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div style="display:flex;align-items:center;gap:11px;margin-bottom:28px">
+    <div style="width:28px;height:28px;border-radius:9px;background:#5B3FB8"></div>
+    <b style="font-size:15px">Sutar Tech</b>
+  </div>
+
+  <h1>Member pages</h1>
+  <p class="lede">Each member keeps their own page here and edits it themselves. Pick a page below, or sign in to manage yours.</p>
+
+  <div class="grid">
+    <a class="card" href="/sarada/"><b>Sarada Sutar</b><span>Tailoring &amp; boutique</span><div class="mono" style="margin-top:8px">/sarada</div></a>
+    <a class="card" href="/samar/"><b>Samar Sutar</b><span>Electrical contractor</span><div class="mono" style="margin-top:8px">/samar</div></a>
+  </div>
+
+  <footer>
+    <a href="/admin/">Member sign in →</a>
+  </footer>
+</div>
+</body>
+</html>

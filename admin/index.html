@@ -1,0 +1,652 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Dashboard — Sutar Tech</title>
+<meta name="robots" content="noindex">
+<link rel="preconnect" href="https://script.google.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,400;6..72,500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  html,body{margin:0;padding:0;background:#FBF7F1}
+  body{font-family:"Helvetica Neue",Helvetica,Arial,sans-serif;color:#221E1A;-webkit-font-smoothing:antialiased}
+  *{box-sizing:border-box}
+  h1,h2,h3{font-family:Newsreader,Georgia,serif;font-weight:500;letter-spacing:-0.01em;margin:0}
+  a{color:#5B3FB8;text-decoration:none}
+  a:hover{color:#4A31A0}
+  input,button,textarea{font-family:inherit}
+  ::selection{background:#E0D6F7}
+  button,a,input,textarea{transition:background-color .16s ease,border-color .16s ease,color .16s ease,box-shadow .16s ease,transform .16s ease}
+  .in{width:100%;padding:10px 12px;font-size:14px;border:1px solid #DCD1C0;border-radius:11px;background:#FFFDFA;color:#221E1A}
+  .in:focus{border-color:#5B3FB8;outline:none;box-shadow:0 0 0 3px #EDE7FB}
+  .in.sm{padding:8px 11px;font-size:13.5px;border-radius:9px;border-color:#E8DFD1}
+  .in.mono{font-family:"JetBrains Mono",monospace;font-size:11.5px;color:#5C544B}
+  .lab{display:block;font-size:12px;font-weight:600;color:#5C544B;margin-bottom:7px}
+  .btn{padding:8px 14px;font-size:13px;font-weight:500;background:#fff;color:#221E1A;border:1px solid #DCD1C0;border-radius:10px;cursor:pointer;white-space:nowrap;flex-shrink:0}
+  .btn:hover{border-color:#221E1A}
+  .btn.p{background:#5B3FB8;color:#fff;border-color:#5B3FB8;font-weight:600}
+  .btn.p:hover{background:#4A31A0;border-color:#4A31A0;transform:translateY(-1px)}
+  .btn.q{border:none;background:transparent;color:#6B6157}
+  .btn.q:hover{color:#221E1A}
+  .btn.xs{padding:7px 10px;font-size:12px;border-radius:9px;color:#6B6157;border-color:#E8DFD1;background:transparent}
+  .btn.xs:hover{color:#8C2F0C;border-color:#8C2F0C}
+  .card{background:#fff;border:1px solid #E8DFD1;border-radius:16px}
+  .row{background:#fff;border:1px solid #E8DFD1;border-radius:14px;padding:13px 14px;display:flex;flex-wrap:wrap;gap:12px;align-items:center}
+  .tab{display:flex;align-items:center;justify-content:space-between;gap:8px;width:100%;text-align:left;padding:9px 11px;font-size:13.5px;border:none;border-radius:10px;cursor:pointer;background:transparent;color:#5C544B;white-space:nowrap}
+  .tab:hover{background:#F5EFE5}
+  .tab.on{background:#F0E9F9;color:#3A2580;font-weight:600}
+  .tab em{font-family:"JetBrains Mono",monospace;font-style:normal;font-size:10.5px;color:#6B6157}
+  .pill{display:flex;align-items:center;gap:7px;padding:6px 11px;border-radius:999px;font-size:12px;font-weight:500;white-space:nowrap}
+  .dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+  .panel{animation:rise .26s ease both}
+  @keyframes rise{from{opacity:0;transform:translateY(7px)}to{opacity:1;transform:none}}
+  @keyframes pop{from{opacity:0;transform:translateY(8px) scale(.985)}to{opacity:1;transform:none}}
+  @keyframes toast{from{opacity:0;transform:translate(-50%,12px)}to{opacity:1;transform:translate(-50%,0)}}
+  @keyframes sweep{from{transform:translateX(-100%)}to{transform:translateX(300%)}}
+  @media (prefers-reduced-motion:reduce){*{animation-duration:.01ms!important;transition-duration:.01ms!important}}
+  .ph{width:286px;max-width:100%;border-radius:34px;padding:9px;background:#221E1A;box-shadow:0 18px 40px -20px rgba(34,30,26,.5)}
+  .ph > div{border-radius:26px;overflow:hidden}
+  .grid{display:grid;gap:12px}
+  #toast{position:fixed;left:50%;bottom:26px;transform:translateX(-50%);z-index:70;display:none;align-items:center;gap:10px;padding:11px 18px;background:#221E1A;color:#F6F1EA;border-radius:999px;box-shadow:0 16px 36px -16px rgba(34,30,26,.6);font-size:13px;white-space:nowrap}
+  #toast.show{display:flex;animation:toast .2s ease both}
+  #pal{position:fixed;inset:0;z-index:60;display:none;background:rgba(34,30,26,.32);backdrop-filter:blur(3px);align-items:flex-start;justify-content:center;padding:12vh 20px 20px}
+  #pal.show{display:flex}
+  #pal .box{width:100%;max-width:480px;background:#FFFDFA;border:1px solid #E8DFD1;border-radius:18px;box-shadow:0 30px 70px -24px rgba(34,30,26,.45);overflow:hidden;animation:pop .18s ease both}
+  #pal .it{display:flex;align-items:center;justify-content:space-between;gap:12px;width:100%;text-align:left;padding:10px 13px;font-size:13.5px;border:none;border-radius:10px;cursor:pointer;background:transparent}
+  #pal .it.on,#pal .it:hover{background:#F0E9F9}
+  #pal .it small{font-family:"JetBrains Mono",monospace;font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:#6B6157;margin-right:9px}
+  @media (max-width:900px){#side{position:static!important;flex:1 1 100%!important;border-right:none!important;border-bottom:1px solid #E8DFD1}#prev{position:static!important;flex:1 1 100%!important;border-left:none!important;border-top:1px solid #E8DFD1}}
+</style>
+</head>
+<body>
+
+<div id="app"></div>
+<div id="toast"><span class="dot" style="background:#7FD3A0"></span><span id="toastMsg"></span></div>
+<div id="pal"><div class="box">
+  <input id="palQ" class="in" placeholder="Search members, tabs, actions…" style="border:none;border-bottom:1px solid #EFE7DA;border-radius:0;padding:16px 18px;font-size:15px;background:transparent">
+  <div id="palList" style="max-height:340px;overflow-y:auto;padding:8px"></div>
+  <div style="display:flex;gap:14px;padding:10px 16px;border-top:1px solid #EFE7DA;background:#F7F1E8;font-family:'JetBrains Mono',monospace;font-size:10.5px;color:#6B6157">
+    <span>↑↓ move</span><span>↵ open</span><span>esc close</span><span>⌘S publish</span>
+  </div>
+</div></div>
+
+<script src="../assets/api.js"></script>
+<script src="../assets/common.js"></script>
+<script>
+var esc = ST.esc;
+var S = {
+  view: 'login', tab: 'profile', me: null, page: null, editing: null,
+  dirty: 0, publish: 'live', members: [], busy: false, palIdx: 0
+};
+var app = document.getElementById('app');
+var $ = function (s) { return document.querySelector(s); };
+
+/* ---------------------------------------------------------------- utils */
+function toast(msg) {
+  var t = $('#toast');
+  $('#toastMsg').textContent = msg;
+  t.classList.add('show');
+  clearTimeout(toast._t);
+  toast._t = setTimeout(function () { t.classList.remove('show'); }, 2300);
+}
+function get(path) {
+  return path.split('.').reduce(function (o, k) { return o == null ? o : o[k]; }, S.page);
+}
+function set(path, val) {
+  var ks = path.split('.'), o = S.page;
+  for (var i = 0; i < ks.length - 1; i++) o = o[ks[i]];
+  o[ks[ks.length - 1]] = val;
+  S.dirty++;
+  S.publish = 'draft';
+  paintPreview();
+  paintChip();
+}
+function slugify(s) { return String(s || '').toLowerCase().replace(/[^a-z0-9-]/g, ''); }
+function isOwnerEditingOther() { return S.me.role === 'owner' && S.editing !== S.me.slug; }
+
+/* ------------------------------------------------------------- rendering */
+function render() {
+  if (S.view === 'login') app.innerHTML = loginHtml();
+  else if (S.view === 'owner') app.innerHTML = ownerHtml();
+  else app.innerHTML = dashHtml();
+  if (S.view === 'dash') { paintPreview(); paintChip(); }
+}
+
+function loginHtml() {
+  return ''
+  + '<div style="min-height:100vh;display:flex;align-items:center;justify-content:center;padding:48px 20px;'
+  + 'background:radial-gradient(1000px 520px at 50% -10%,#F3ECFB 0%,#FBF7F1 62%)">'
+  + '<div style="width:100%;max-width:400px" class="panel">'
+  +   '<div style="display:flex;align-items:center;gap:11px;margin-bottom:30px">'
+  +     '<div style="width:30px;height:30px;border-radius:9px;background:#5B3FB8"></div>'
+  +     '<div><div style="font-size:15px;font-weight:600">Sutar Tech</div>'
+  +     '<div style="font-family:\'JetBrains Mono\',monospace;font-size:10.5px;color:#6B6157">member pages</div></div>'
+  +   '</div>'
+  +   '<h1 style="font-size:32px;line-height:1.15;margin-bottom:8px">Sign in to your page</h1>'
+  +   '<p style="margin:0 0 26px;font-size:14.5px;line-height:1.6;color:#5C544B">Edit your own page only. Changes go live within a minute of publishing.</p>'
+  +   '<form id="loginForm" class="card" style="padding:26px;box-shadow:0 1px 2px rgba(34,30,26,.04),0 8px 24px -12px rgba(34,30,26,.12)">'
+  +     '<label class="lab" for="uid">User ID</label>'
+  +     '<input class="in" id="uid" autocomplete="username" autocapitalize="off" placeholder="sarada" style="margin-bottom:15px">'
+  +     '<label class="lab" for="pw">Password</label>'
+  +     '<input class="in" id="pw" type="password" autocomplete="current-password" placeholder="••••••••">'
+  +     '<div id="loginErr" style="display:none;margin-top:11px;padding:9px 11px;font-size:12.5px;line-height:1.45;color:#8C2F0C;background:#FBEDE6;border-radius:9px"></div>'
+  +     '<button class="btn p" id="loginBtn" style="width:100%;margin-top:18px;padding:12px;font-size:14.5px">Sign in</button>'
+  +   '</form>'
+  +   '<p style="margin-top:16px;font-size:12px;color:#6B6157">Forgot your password? Ask the owner to reset it.</p>'
+  + '</div></div>';
+}
+
+function dashHtml() {
+  var p = S.page, pf = p.profile || {};
+  var tabs = [
+    ['profile', 'Profile', ''],
+    ['pages', 'Pages', String(p.pages.length)],
+    ['links', 'Links', String(p.links.length)],
+    ['channels', 'Channels', String(p.channels.length)],
+    ['theme', 'Theme', (ST.THEMES[pf.theme] || ST.THEMES.cream).name]
+  ];
+  return ''
+  + '<div style="position:sticky;top:0;z-index:12;display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between;'
+  + 'padding:13px 22px;background:#FFFFFFEE;backdrop-filter:blur(8px);border-bottom:1px solid #E8DFD1">'
+  +   '<div id="depBar" style="display:none;position:absolute;left:0;right:0;bottom:-1px;height:2px;overflow:hidden;background:#EDE7FB">'
+  +     '<div style="width:34%;height:100%;background:#5B3FB8;animation:sweep 1s linear infinite"></div></div>'
+  +   '<div style="display:flex;align-items:center;gap:12px;min-width:0">'
+  +     '<div style="width:26px;height:26px;border-radius:8px;background:#5B3FB8;flex-shrink:0"></div>'
+  +     '<span style="font-size:14.5px;font-weight:600;white-space:nowrap">Sutar Tech</span>'
+  +     '<span style="color:#DCD1C0">/</span>'
+  +     '<a href="/' + esc(S.editing) + '/" target="_blank" style="font-family:\'JetBrains Mono\',monospace;font-size:12.5px;white-space:nowrap">sutartech.github.io/' + esc(S.editing) + '</a>'
+  +     (isOwnerEditingOther() ? '<span class="pill" style="background:#FBF1DF;color:#6E4C08">editing as owner</span>' : '')
+  +   '</div>'
+  +   '<div style="display:flex;align-items:center;gap:9px;flex-wrap:wrap">'
+  +     '<span id="chip" class="pill"></span>'
+  +     '<button class="btn" data-act="pal" style="display:flex;align-items:center;gap:8px;background:#F5EFE5;color:#5C544B;border-color:#E8DFD1">Jump to…'
+  +       '<span style="font-family:\'JetBrains Mono\',monospace;font-size:11px;padding:1px 5px;border-radius:5px;background:#fff;border:1px solid #E8DFD1">⌘K</span></button>'
+  +     '<button class="btn" data-act="copy">Copy link</button>'
+  +     (S.me.role === 'owner' ? '<button class="btn" data-act="owner">Owner console</button>' : '')
+  +     '<button class="btn p" data-act="publish">Publish</button>'
+  +     '<button class="btn q" data-act="logout">Sign out</button>'
+  +   '</div>'
+  + '</div>'
+
+  + '<div style="display:flex;flex-wrap:wrap;align-items:stretch">'
+  +   '<div id="side" style="flex:0 0 228px;min-width:200px;padding:20px 14px;border-right:1px solid #E8DFD1;'
+  +   'display:flex;flex-direction:column;gap:3px;position:sticky;top:57px;align-self:flex-start">'
+  +     '<div style="display:flex;align-items:center;gap:11px;padding:10px;margin-bottom:14px;background:#F5EFE5;border-radius:13px">'
+  +       '<div style="width:34px;height:34px;border-radius:50%;background:#EFE7DA;flex-shrink:0"></div>'
+  +       '<div style="min-width:0"><div style="font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">' + esc(pf.name || S.editing) + '</div>'
+  +       '<div style="font-family:\'JetBrains Mono\',monospace;font-size:10.5px;color:#6B6157">/' + esc(S.editing) + '</div></div>'
+  +     '</div>'
+  +     tabs.map(function (t) {
+            return '<button class="tab' + (S.tab === t[0] ? ' on' : '') + '" data-tab="' + t[0] + '">'
+              + '<span>' + t[1] + '</span><em>' + esc(t[2]) + '</em></button>';
+          }).join('')
+  +     '<div style="margin-top:20px;padding:13px;background:#F0E9F9;border-radius:13px">'
+  +       '<div style="font-size:12.5px;font-weight:600;margin-bottom:4px">' + (p.visits || 0) + ' visits</div>'
+  +       '<div style="font-size:11.5px;line-height:1.5;color:#5C544B">in the last 30 days · '
+  +       p.links.reduce(function (a, l) { return a + (l.taps || 0); }, 0) + ' link taps</div>'
+  +     '</div>'
+  +     '<button class="btn q" data-act="pwform" style="margin-top:14px;text-align:left;font-size:12.5px">Change password</button>'
+  +   '</div>'
+
+  +   '<div id="panel" style="flex:1 1 400px;min-width:320px;padding:26px 24px 44px">' + panelHtml() + '</div>'
+
+  +   '<div id="prev" style="flex:0 0 348px;min-width:300px;border-left:1px solid #E8DFD1;background:#F7F1E8;'
+  +   'padding:22px 24px 40px;display:flex;flex-direction:column;align-items:center;gap:14px;position:sticky;top:57px;align-self:flex-start">'
+  +     '<div style="width:100%;display:flex;align-items:center;justify-content:space-between;gap:10px">'
+  +       '<span style="font-family:\'JetBrains Mono\',monospace;font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:#6B6157">live preview</span>'
+  +       '<a class="btn" href="/' + esc(S.editing) + '/" target="_blank" style="padding:5px 10px;font-size:11.5px;border-radius:999px">Open page</a>'
+  +     '</div>'
+  +     '<div class="ph"><div id="phone"></div></div>'
+  +   '</div>'
+  + '</div>';
+}
+
+function panelHtml() {
+  var p = S.page, pf = p.profile || {};
+  var h2 = function (t, sub) {
+    return '<div style="margin-bottom:18px"><h2 style="font-size:25px;margin-bottom:3px">' + t + '</h2>'
+      + '<p style="margin:0;font-size:13.5px;color:#6B6157">' + sub + '</p></div>';
+  };
+
+  if (S.tab === 'profile') {
+    return '<div class="panel" style="max-width:620px">'
+    + h2('Profile', 'Saved to your rows in the profile sheet.')
+    + '<div class="card" style="padding:22px;display:flex;flex-direction:column;gap:17px">'
+    +   '<div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(200px,1fr))">'
+    +     '<div><label class="lab">Display name</label><input class="in" data-bind="profile.name" value="' + esc(pf.name || '') + '"></div>'
+    +     '<div><label class="lab">Location</label><input class="in" data-bind="profile.location" value="' + esc(pf.location || '') + '"></div>'
+    +   '</div>'
+    +   '<div><label class="lab">Headline</label><input class="in" data-bind="profile.headline" value="' + esc(pf.headline || '') + '"></div>'
+    +   '<div><div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:7px">'
+    +     '<label class="lab" style="margin:0">About</label>'
+    +     '<span id="bioCount" style="font-family:\'JetBrains Mono\',monospace;font-size:11px;color:#6B6157">' + String(pf.bio || '').length + '/280</span></div>'
+    +     '<textarea class="in" rows="4" maxlength="280" data-bind="profile.bio" style="line-height:1.6;resize:vertical">' + esc(pf.bio || '') + '</textarea></div>'
+    +   '<div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(200px,1fr))">'
+    +     '<div><label class="lab">WhatsApp number</label><input class="in mono" data-bind="profile.phone" value="' + esc(pf.phone || '') + '"></div>'
+    +     '<div><label class="lab">Page slug</label><input class="in mono" value="' + esc(S.editing) + '" disabled style="background:#F5EFE5;color:#6B6157"></div>'
+    +   '</div>'
+    +   '<div style="font-size:12.5px;line-height:1.55;color:#6B6157">Photo: commit a square image as <code>/' + esc(S.editing) + '/avatar.jpg</code> in the repo.</div>'
+    + '</div></div>';
+  }
+
+  if (S.tab === 'pages') {
+    return '<div class="panel" style="max-width:620px">'
+    + '<div style="display:flex;flex-wrap:wrap;gap:12px;align-items:flex-end;justify-content:space-between;margin-bottom:18px">'
+    +   '<div><h2 style="font-size:25px;margin-bottom:3px">Pages</h2>'
+    +   '<p style="margin:0;font-size:13.5px;color:#6B6157">Each live page needs a matching folder in the repo.</p></div>'
+    +   '<button class="btn p" data-act="addPage">New page</button></div>'
+    + '<div style="display:flex;flex-direction:column;gap:9px">'
+    + p.pages.map(function (pg, i) {
+        var home = !pg.path;
+        return '<div class="row">'
+        + '<div style="flex:1 1 230px;min-width:200px;display:flex;flex-direction:column;gap:7px">'
+        +   '<input class="in sm" data-bind="pages.' + i + '.title" value="' + esc(pg.title || '') + '" style="font-weight:500">'
+        +   '<div style="display:flex;align-items:center;border:1px solid #E8DFD1;border-radius:9px;background:#FFFDFA;overflow:hidden">'
+        +     '<span style="padding:7px 0 7px 10px;font-family:\'JetBrains Mono\',monospace;font-size:11px;color:#6B6157;white-space:nowrap">/' + esc(S.editing) + '/</span>'
+        +     '<input class="in mono" data-bind="pages.' + i + '.path" data-slugify="1" value="' + esc(pg.path || '') + '"'
+        +     (home ? ' disabled placeholder="home"' : '') + ' style="border:none;background:transparent;padding:7px 10px">'
+        +   '</div>'
+        + '</div>'
+        + '<div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">'
+        +   '<div style="text-align:right"><div style="font-family:\'JetBrains Mono\',monospace;font-size:14px;font-weight:500">' + (pg.views || 0) + '</div>'
+        +   '<div style="font-size:10.5px;color:#6B6157">views</div></div>'
+        +   '<span class="pill" style="' + (pg.live ? 'background:#E7F2EA;color:#1F5638' : 'background:#FBF1DF;color:#6E4C08') + '">' + (pg.live ? 'Live' : 'Draft') + '</span>'
+        +   (home ? '<span style="font-size:11px;color:#6B6157">Home page</span>'
+                  : '<button class="btn' + (pg.live ? '' : ' p') + '" data-act="togglePage" data-i="' + i + '">' + (pg.live ? 'Unpublish' : 'Publish') + '</button>'
+                    + '<button class="btn xs" data-act="delPage" data-i="' + i + '">Delete</button>')
+        + '</div></div>';
+      }).join('')
+    + '</div></div>';
+  }
+
+  if (S.tab === 'links') {
+    return '<div class="panel" style="max-width:620px">'
+    + '<div style="display:flex;flex-wrap:wrap;gap:12px;align-items:flex-end;justify-content:space-between;margin-bottom:18px">'
+    +   '<div><h2 style="font-size:25px;margin-bottom:3px">Links</h2>'
+    +   '<p style="margin:0;font-size:13.5px;color:#6B6157">Reorder with the arrows. Taps counted for the last 30 days.</p></div>'
+    +   '<button class="btn p" data-act="addLink">Add link</button></div>'
+    + '<div style="display:flex;flex-direction:column;gap:9px">'
+    + p.links.map(function (l, i) {
+        var ar = function (on) { return 'width:22px;height:18px;font-size:10px;line-height:1;display:flex;align-items:center;justify-content:center;border:1px solid #E8DFD1;border-radius:6px;background:#FFFDFA;cursor:' + (on ? 'pointer' : 'default') + ';color:' + (on ? '#5C544B' : '#CFC4B4'); };
+        return '<div class="row">'
+        + '<div style="display:flex;flex-direction:column;gap:2px;flex-shrink:0">'
+        +   '<button data-act="moveLink" data-i="' + i + '" data-d="-1" style="' + ar(i > 0) + '">↑</button>'
+        +   '<button data-act="moveLink" data-i="' + i + '" data-d="1" style="' + ar(i < p.links.length - 1) + '">↓</button></div>'
+        + '<div style="flex:1 1 240px;min-width:200px;display:flex;flex-direction:column;gap:7px">'
+        +   '<input class="in sm" data-bind="links.' + i + '.label" value="' + esc(l.label || '') + '" placeholder="Label" style="font-weight:500">'
+        +   '<input class="in sm mono" data-bind="links.' + i + '.url" value="' + esc(l.url || '') + '" placeholder="https://"></div>'
+        + '<div style="display:flex;align-items:center;gap:12px;flex-shrink:0">'
+        +   '<div style="text-align:right"><div style="font-family:\'JetBrains Mono\',monospace;font-size:14px;font-weight:500">' + (l.taps || 0) + '</div>'
+        +   '<div style="font-size:10.5px;color:#6B6157">taps</div></div>'
+        +   '<button class="btn xs" data-act="delLink" data-i="' + i + '">Remove</button></div>'
+        + '</div>';
+      }).join('')
+    + '</div></div>';
+  }
+
+  if (S.tab === 'channels') {
+    var have = p.channels.map(function (c) { return c.network; });
+    var addable = Object.keys(ST.NETWORKS).filter(function (k) { return have.indexOf(k) < 0; });
+    return '<div class="panel" style="max-width:620px">'
+    + h2('Channels', 'Facebook page, Instagram and the rest. Shown ones appear as icons on your page.')
+    + '<div style="display:flex;flex-direction:column;gap:9px">'
+    + p.channels.map(function (c, i) {
+        var n = ST.NETWORKS[c.network] || { name: c.network, mark: '?', brand: '#5C544B', hint: '' };
+        return '<div class="row">'
+        + '<span style="width:34px;height:34px;border-radius:10px;flex-shrink:0;display:flex;align-items:center;justify-content:center;'
+        + 'font-family:\'JetBrains Mono\',monospace;font-size:12px;color:#fff;background:' + n.brand + '">' + esc(n.mark) + '</span>'
+        + '<div style="flex:1 1 220px;min-width:190px">'
+        +   '<div style="display:flex;flex-wrap:wrap;gap:8px;align-items:baseline;margin-bottom:6px">'
+        +     '<span style="font-size:13.5px;font-weight:600">' + esc(n.name) + '</span>'
+        +     '<input class="in mono" data-bind="channels.' + i + '.followers" value="' + esc(c.followers || '') + '" placeholder="followers"'
+        +     ' style="width:110px;padding:3px 7px;border-radius:6px"></div>'
+        +   '<input class="in sm mono" data-bind="channels.' + i + '.handle" value="' + esc(c.handle || '') + '" placeholder="' + esc(n.hint) + '"></div>'
+        + '<div style="display:flex;align-items:center;gap:9px;flex-wrap:wrap">'
+        +   '<button class="pill" data-act="toggleChan" data-i="' + i + '" style="cursor:pointer;border:1px solid '
+        +   (c.show ? '#5B3FB8;background:#F0E9F9;color:#3A2580' : '#DCD1C0;background:#fff;color:#5C544B') + '">'
+        +     '<span class="dot" style="background:' + (c.show ? '#5B3FB8' : '#C6B9A4') + '"></span>' + (c.show ? 'Shown on page' : 'Hidden') + '</button>'
+        +   '<button class="btn xs" data-act="delChan" data-i="' + i + '">Remove</button></div>'
+        + '</div>';
+      }).join('')
+    + '</div>'
+    + (addable.length ? '<div style="background:#F5EFE5;border-radius:14px;padding:16px;margin-top:16px">'
+        + '<div style="font-size:12.5px;font-weight:600;margin-bottom:11px">Add a channel</div>'
+        + '<div style="display:flex;flex-wrap:wrap;gap:8px">'
+        + addable.map(function (k) {
+            var n = ST.NETWORKS[k];
+            return '<button data-act="addChan" data-net="' + k + '" style="display:flex;align-items:center;gap:8px;padding:8px 13px;'
+              + 'font-size:12.5px;font-weight:500;cursor:pointer;background:#FFFDFA;border:1px dashed #C6B9A4;border-radius:999px;color:#221E1A">'
+              + '<span style="width:20px;height:20px;border-radius:6px;display:flex;align-items:center;justify-content:center;'
+              + 'font-family:\'JetBrains Mono\',monospace;font-size:10px;color:#fff;background:' + n.brand + '">' + n.mark + '</span>'
+              + esc(n.name) + '</button>';
+          }).join('')
+        + '</div><div style="margin-top:12px;font-size:12px;line-height:1.55;color:#5C544B">Follower counts are typed in — a static page cannot call the Facebook or Instagram APIs.</div></div>' : '')
+    + '</div>';
+  }
+
+  if (S.tab === 'theme') {
+    var cur = pf.theme || 'cream', curShape = pf.shape || 'rounded';
+    return '<div class="panel" style="max-width:620px">'
+    + h2('Theme', 'One value in the sheet. The preview updates as you pick.')
+    + '<div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(150px,1fr))">'
+    + Object.keys(ST.THEMES).map(function (k) {
+        var t = ST.THEMES[k], on = k === cur;
+        return '<button data-act="setTheme" data-k="' + k + '" style="display:flex;flex-direction:column;gap:9px;padding:11px;text-align:left;'
+        + 'border:1px solid ' + (on ? '#5B3FB8' : '#E8DFD1') + ';box-shadow:' + (on ? '0 0 0 3px #EDE7FB' : 'none') + ';border-radius:15px;background:#fff;cursor:pointer">'
+        + '<span style="height:68px;border-radius:10px;background:' + t.bg + ';border:1px solid ' + t.hairline + ';display:flex;flex-direction:column;align-items:center;justify-content:center;gap:7px">'
+        +   '<span style="width:20px;height:20px;border-radius:50%;background:' + t.accent + '"></span>'
+        +   '<span style="width:60%;height:8px;border-radius:999px;background:' + t.card + ';border:1px solid ' + t.hairline + '"></span></span>'
+        + '<span style="display:flex;align-items:center;justify-content:space-between;gap:8px;padding:0 2px">'
+        +   '<span style="font-size:13px;font-weight:600">' + t.name + '</span>'
+        +   '<span style="font-size:12px;color:#5B3FB8;opacity:' + (on ? 1 : 0) + '">✓</span></span></button>';
+      }).join('')
+    + '</div>'
+    + '<div class="card" style="padding:18px;margin-top:16px">'
+    +   '<div style="font-size:13px;font-weight:600;margin-bottom:14px">Button shape</div>'
+    +   '<div style="display:flex;flex-wrap:wrap;gap:8px">'
+    +   Object.keys(ST.SHAPES).map(function (k) {
+          var on = k === curShape;
+          return '<button data-act="setShape" data-k="' + k + '" style="padding:8px 14px;font-size:12.5px;cursor:pointer;'
+          + 'font-weight:' + (on ? 600 : 400) + ';border:1px solid ' + (on ? '#5B3FB8' : '#DCD1C0') + ';'
+          + 'color:' + (on ? '#3A2580' : '#5C544B') + ';background:' + (on ? '#F0E9F9' : '#FFFDFA') + ';border-radius:' + ST.SHAPES[k] + '">'
+          + k.charAt(0).toUpperCase() + k.slice(1) + '</button>';
+        }).join('')
+    +   '</div></div></div>';
+  }
+  return '';
+}
+
+function ownerHtml() {
+  var m = S.members, maxV = Math.max.apply(null, m.map(function (x) { return x.visits; }).concat([1]));
+  var stat = function (v, l) {
+    return '<div class="card" style="padding:17px 18px"><div style="font-family:Newsreader,Georgia,serif;font-size:28px;line-height:1">' + v + '</div>'
+      + '<div style="font-size:12px;color:#5C544B;margin-top:6px">' + l + '</div></div>';
+  };
+  return ''
+  + '<div style="padding:32px 24px 56px;max-width:1080px;margin:0 auto" class="panel">'
+  + '<div style="display:flex;flex-wrap:wrap;gap:14px;align-items:flex-end;justify-content:space-between;margin-bottom:24px">'
+  +   '<div><h2 style="font-size:27px;margin-bottom:3px">Owner console</h2>'
+  +   '<p style="margin:0;font-size:13.5px;color:#6B6157">' + m.length + ' member ' + (m.length === 1 ? 'page' : 'pages') + ' under one repo.</p></div>'
+  +   '<div style="display:flex;gap:9px"><button class="btn" data-act="mine">My page</button>'
+  +   '<button class="btn q" data-act="logout">Sign out</button></div></div>'
+  + '<div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(150px,1fr));margin-bottom:26px">'
+  +   stat(m.length, 'Members')
+  +   stat(m.reduce(function (a, x) { return a + x.visits; }, 0), 'Visits, 30 days')
+  +   stat(m.reduce(function (a, x) { return a + x.pages; }, 0), 'Live pages')
+  +   stat(m.reduce(function (a, x) { return a + x.channels; }, 0), 'Channels linked')
+  + '</div>'
+  + '<div class="card" style="overflow:hidden">'
+  +   '<div style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 18px;border-bottom:1px solid #EFE7DA">'
+  +     '<span style="font-size:14px;font-weight:600">Members</span>'
+  +     '<span style="font-family:\'JetBrains Mono\',monospace;font-size:11px;color:#5C544B">users sheet</span></div>'
+  +   m.map(function (u) {
+        var sp = u.status === 'active' ? 'background:#E7F2EA;color:#1F5638'
+               : u.status === 'invited' ? 'background:#F0E9F9;color:#3A2580' : 'background:#F3ECE1;color:#5C544B';
+        return '<div style="display:flex;flex-wrap:wrap;gap:14px;align-items:center;padding:14px 18px;border-bottom:1px solid #EFE7DA">'
+        + '<div style="flex:1 1 170px;min-width:150px"><div style="font-size:13.5px;font-weight:600">' + esc(u.name || u.userId) + '</div>'
+        +   '<a href="/' + esc(u.slug) + '/" target="_blank" style="font-family:\'JetBrains Mono\',monospace;font-size:11px">/' + esc(u.slug) + '</a></div>'
+        + '<div style="flex:1 1 130px;min-width:110px">'
+        +   '<div style="height:6px;border-radius:999px;background:#F0E9F9;overflow:hidden">'
+        +     '<div style="height:100%;width:' + Math.round((u.visits / maxV) * 100) + '%;background:#5B3FB8"></div></div>'
+        +   '<div style="font-size:11px;color:#5C544B;margin-top:5px">' + u.visits + ' visits · ' + u.pages + ' pages · ' + u.channels + ' channels</div></div>'
+        + '<span class="pill" style="' + sp + '">' + esc(u.status) + '</span>'
+        + '<button class="btn" data-act="openMember" data-slug="' + esc(u.slug) + '">Open dashboard</button>'
+        + '<button class="btn xs" data-act="setStatus" data-uid="' + esc(u.userId) + '" data-s="' + (u.status === 'paused' ? 'active' : 'paused') + '">'
+        +   (u.status === 'paused' ? 'Reactivate' : 'Pause') + '</button>'
+        + '</div>';
+      }).join('')
+  + '</div>'
+  + '<div class="card" style="padding:20px;margin-top:16px;max-width:460px">'
+  +   '<div style="font-size:14px;font-weight:600;margin-bottom:4px">Invite a member</div>'
+  +   '<div style="font-size:12.5px;line-height:1.55;color:#5C544B;margin-bottom:16px">Creates the users row and a Home page. Then add the folder <code>/slug/index.html</code> to the repo.</div>'
+  +   '<div style="display:flex;flex-direction:column;gap:12px">'
+  +     '<div><label class="lab">Name</label><input class="in" id="invName" placeholder="Meera Sutar"></div>'
+  +     '<div><label class="lab">Slug / user id</label><input class="in mono" id="invSlug" placeholder="meera"></div>'
+  +     '<button class="btn p" data-act="invite" style="align-self:flex-start">Create account</button>'
+  +   '</div>'
+  +   '<div id="invOut" style="display:none;margin-top:14px;padding:12px 14px;background:#F0E9F9;border-radius:11px;font-size:12.5px;line-height:1.6"></div>'
+  + '</div></div>';
+}
+
+/* ------------------------------------------------------- partial repaints */
+function paintPreview() {
+  var ph = $('#phone');
+  if (!ph) return;
+  var t = ST.theme(S.page);
+  ph.style.background = t.bg;
+  ph.innerHTML = '<div style="height:26px;display:flex;align-items:center;justify-content:center">'
+    + '<span style="width:54px;height:4px;border-radius:999px;background:' + t.hairline + '"></span></div>'
+    + ST.renderPage(S.page, { scale: 'sm', avatar: '/' + S.editing + '/avatar.jpg' });
+  ph.querySelectorAll('a').forEach(function (a) { a.removeAttribute('href'); a.style.cursor = 'default'; });
+}
+
+function paintChip() {
+  var c = $('#chip'); if (!c) return;
+  var map = {
+    live:      ['Live', '#E7F2EA', '#2E7D4F', '#1F5638'],
+    draft:     [S.dirty + ' unpublished ' + (S.dirty === 1 ? 'change' : 'changes'), '#FBF1DF', '#B07B10', '#6E4C08'],
+    deploying: ['Publishing…', '#F0E9F9', '#5B3FB8', '#3A2580']
+  }[S.publish];
+  c.style.background = map[1];
+  c.style.color = map[3];
+  c.innerHTML = '<span class="dot" style="background:' + map[2] + '"></span>' + map[0];
+  var bar = $('#depBar'); if (bar) bar.style.display = S.publish === 'deploying' ? 'block' : 'none';
+}
+
+function repaintPanel() { var el = $('#panel'); if (el) el.innerHTML = panelHtml(); paintPreview(); }
+
+/* ----------------------------------------------------------------- actions */
+var ACT = {
+  logout: function () { API.logout(); S.view = 'login'; S.page = null; render(); },
+  pal: openPal,
+  copy: function () {
+    var url = 'https://sutartech.github.io/' + S.editing + '/';
+    (navigator.clipboard ? navigator.clipboard.writeText(url) : Promise.reject())
+      .then(function () { toast('Link copied'); })
+      .catch(function () { toast(url); });
+  },
+  owner: function () { loadOwner(); },
+  mine: function () { openMember(S.me.slug); },
+  publish: publish,
+  addPage: function () {
+    var taken = S.page.pages.map(function (p) { return p.path; }), path = 'new-page', n = 2;
+    while (taken.indexOf(path) >= 0) path = 'new-page-' + n++;
+    S.page.pages.push({ path: path, title: 'Untitled page', live: false, views: 0, body: '' });
+    S.dirty++; S.publish = 'draft'; repaintPanel(); paintChip();
+  },
+  togglePage: function (b) {
+    var i = +b.dataset.i, pg = S.page.pages[i];
+    pg.live = !pg.live;
+    S.dirty++; S.publish = 'draft'; repaintPanel(); paintChip();
+    toast('“' + pg.title + '” ' + (pg.live ? 'will go live on publish' : 'unpublished'));
+  },
+  delPage: function (b) { S.page.pages.splice(+b.dataset.i, 1); S.dirty++; S.publish = 'draft'; repaintPanel(); paintChip(); },
+  addLink: function () { S.page.links.push({ label: 'New link', url: 'https://', taps: 0 }); S.dirty++; S.publish = 'draft'; repaintPanel(); paintChip(); },
+  delLink: function (b) { S.page.links.splice(+b.dataset.i, 1); S.dirty++; S.publish = 'draft'; repaintPanel(); paintChip(); },
+  moveLink: function (b) {
+    var i = +b.dataset.i, d = +b.dataset.d, L = S.page.links;
+    if (i + d < 0 || i + d >= L.length) return;
+    L.splice(i + d, 0, L.splice(i, 1)[0]);
+    S.dirty++; S.publish = 'draft'; repaintPanel(); paintChip();
+  },
+  addChan: function (b) {
+    var k = b.dataset.net;
+    S.page.channels.push({ network: k, handle: ST.NETWORKS[k].hint, followers: '', show: true });
+    S.dirty++; S.publish = 'draft'; repaintPanel(); paintChip();
+  },
+  toggleChan: function (b) { var c = S.page.channels[+b.dataset.i]; c.show = !c.show; S.dirty++; S.publish = 'draft'; repaintPanel(); paintChip(); },
+  delChan: function (b) { S.page.channels.splice(+b.dataset.i, 1); S.dirty++; S.publish = 'draft'; repaintPanel(); paintChip(); },
+  setTheme: function (b) { S.page.profile.theme = b.dataset.k; S.dirty++; S.publish = 'draft'; repaintPanel(); paintChip(); },
+  setShape: function (b) { S.page.profile.shape = b.dataset.k; S.dirty++; S.publish = 'draft'; repaintPanel(); paintChip(); },
+  openMember: function (b) { openMember(b.dataset.slug); },
+  setStatus: function (b) {
+    API.call('setStatus', { userId: b.dataset.uid, status: b.dataset.s })
+      .then(function () { toast('Status updated'); loadOwner(); })
+      .catch(function (e) { toast(e.message); });
+  },
+  invite: function () {
+    var name = $('#invName').value.trim(), slug = slugify($('#invSlug').value || name.split(' ')[0]);
+    if (!slug) return toast('Enter a slug');
+    API.call('invite', { name: name, slug: slug }).then(function (d) {
+      var out = $('#invOut');
+      out.style.display = 'block';
+      out.innerHTML = '<b>' + esc(d.userId) + '</b> created.<br>Temporary password: <code style="font-size:13px">'
+        + esc(d.tempPassword) + '</code><br>Now add <code>/' + esc(d.userId) + '/index.html</code> to the repo.';
+      $('#invName').value = ''; $('#invSlug').value = '';
+      loadOwner(true);
+    }).catch(function (e) { toast(e.message); });
+  },
+  pwform: function () {
+    var oldPw = prompt('Current password'); if (!oldPw) return;
+    var newPw = prompt('New password (6+ characters)'); if (!newPw) return;
+    API.call('changePw', { oldPw: oldPw, newPw: newPw })
+      .then(function () { toast('Password changed'); })
+      .catch(function (e) { toast(e.message); });
+  }
+};
+
+function publish() {
+  if (S.publish === 'deploying') return;
+  S.publish = 'deploying'; paintChip();
+  var patch = {
+    profile: S.page.profile,
+    pages: S.page.pages.map(function (p) { return { path: p.path, title: p.title, live: p.live, body: p.body || '' }; }),
+    links: S.page.links.map(function (l) { return { label: l.label, url: l.url, taps: l.taps || 0 }; }),
+    channels: S.page.channels.map(function (c) { return { network: c.network, handle: c.handle, followers: c.followers, show: c.show }; })
+  };
+  var action = isOwnerEditingOther() ? 'adminSave' : 'savePage';
+  API.call(action, { slug: S.editing, patch: patch }).then(function (d) {
+    S.page = d.page; S.dirty = 0; S.publish = 'live';
+    localStorage.setItem('pg_' + S.editing, JSON.stringify(d.page));
+    repaintPanel(); paintChip();
+    toast('Published to /' + S.editing);
+  }).catch(function (e) {
+    S.publish = 'draft'; paintChip(); toast(e.message);
+  });
+}
+
+function openMember(slug) {
+  var own = slug === S.me.slug;
+  var req = own ? API.call('getPage', {}) : API.call('adminPage', { slug: slug });
+  toast('Loading /' + slug + '…');
+  req.then(function (d) {
+    S.page = d.page; S.editing = slug; S.tab = 'profile';
+    S.dirty = 0; S.publish = 'live'; S.view = 'dash';
+    render();
+  }).catch(function (e) { toast(e.message); });
+}
+
+function loadOwner(silent) {
+  API.call('listMembers', {}).then(function (d) {
+    S.members = d.members; S.view = 'owner';
+    if (!silent) render(); else { var o = $('#invOut'), html = o ? o.innerHTML : ''; render(); if (html) { $('#invOut').style.display = 'block'; $('#invOut').innerHTML = html; } }
+  }).catch(function (e) { toast(e.message); });
+}
+
+/* ------------------------------------------------------- command palette */
+function palItems() {
+  var items = [];
+  if (S.me && S.me.role === 'owner') {
+    S.members.forEach(function (u) {
+      items.push({ g: 'Member', l: u.name || u.userId, h: '/' + u.slug, run: function () { openMember(u.slug); } });
+    });
+  }
+  [['profile', 'Profile'], ['pages', 'Pages'], ['links', 'Links'], ['channels', 'Channels'], ['theme', 'Theme']]
+    .forEach(function (t) {
+      items.push({ g: 'Go to', l: t[1], h: 'tab', run: function () { S.tab = t[0]; if (S.view !== 'dash') { S.view = 'dash'; render(); } else repaintPanel(), render(); } });
+    });
+  items.push({ g: 'Action', l: 'Publish now', h: '⌘S', run: publish });
+  items.push({ g: 'Action', l: 'Open public page', h: '', run: function () { window.open('/' + S.editing + '/', '_blank'); } });
+  if (S.me && S.me.role === 'owner') items.push({ g: 'Action', l: 'Owner console', h: '', run: loadOwner });
+  items.push({ g: 'Action', l: 'Sign out', h: '', run: ACT.logout });
+  var q = ($('#palQ').value || '').trim().toLowerCase();
+  return q ? items.filter(function (i) { return (i.l + ' ' + i.h).toLowerCase().indexOf(q) >= 0; }) : items;
+}
+function paintPal() {
+  var list = palItems();
+  S.palIdx = Math.max(0, Math.min(S.palIdx, list.length - 1));
+  $('#palList').innerHTML = list.map(function (it, i) {
+    return '<button class="it' + (i === S.palIdx ? ' on' : '') + '" data-pal="' + i + '">'
+      + '<span style="display:flex;align-items:baseline;min-width:0"><small>' + it.g + '</small>'
+      + '<span style="font-weight:500">' + esc(it.l) + '</span></span>'
+      + '<span style="font-family:\'JetBrains Mono\',monospace;font-size:11px;color:#6B6157">' + esc(it.h) + '</span></button>';
+  }).join('');
+}
+function openPal() {
+  if (!S.me) return;
+  $('#pal').classList.add('show');
+  $('#palQ').value = ''; S.palIdx = 0; paintPal(); $('#palQ').focus();
+}
+function closePal() { $('#pal').classList.remove('show'); }
+
+/* -------------------------------------------------------------- listeners */
+document.addEventListener('click', function (e) {
+  var pal = e.target.closest('[data-pal]');
+  if (pal) { var it = palItems()[+pal.dataset.pal]; closePal(); if (it) it.run(); return; }
+  if (e.target === $('#pal')) return closePal();
+  var tab = e.target.closest('[data-tab]');
+  if (tab) { S.tab = tab.dataset.tab; render(); return; }
+  var b = e.target.closest('[data-act]');
+  if (b) { e.preventDefault(); (ACT[b.dataset.act] || function () {})(b); }
+});
+
+document.addEventListener('input', function (e) {
+  var el = e.target;
+  if (el.id === 'palQ') { S.palIdx = 0; return paintPal(); }
+  if (!el.dataset.bind) return;
+  var v = el.value;
+  if (el.dataset.slugify) { v = slugify(v); if (v !== el.value) el.value = v; }
+  set(el.dataset.bind, v);
+  if (el.dataset.bind === 'profile.bio') {
+    var c = $('#bioCount'); if (c) c.textContent = v.length + '/280';
+  }
+});
+
+document.addEventListener('submit', function (e) {
+  if (e.target.id !== 'loginForm') return;
+  e.preventDefault();
+  var btn = $('#loginBtn'), err = $('#loginErr');
+  btn.disabled = true; btn.textContent = 'Signing in…'; err.style.display = 'none';
+  API.login($('#uid').value.trim(), $('#pw').value).then(function (d) {
+    S.me = d.me; S.page = d.page; S.editing = d.me.slug;
+    S.view = 'dash'; S.tab = 'profile'; S.dirty = 0; S.publish = 'live';
+    if (d.me.role === 'owner') API.call('listMembers', {}).then(function (r) { S.members = r.members; });
+    render();
+    toast('Welcome back, ' + (d.me.name || d.me.userId).split(' ')[0]);
+  }).catch(function (ex) {
+    err.textContent = ex.message; err.style.display = 'block';
+    btn.disabled = false; btn.textContent = 'Sign in';
+  });
+});
+
+document.addEventListener('keydown', function (e) {
+  var mod = e.metaKey || e.ctrlKey;
+  if (mod && e.key.toLowerCase() === 'k') { e.preventDefault(); return $('#pal').classList.contains('show') ? closePal() : openPal(); }
+  if (e.key === 'Escape') return closePal();
+  if (mod && e.key.toLowerCase() === 's' && S.view === 'dash') { e.preventDefault(); return publish(); }
+  if (!$('#pal').classList.contains('show')) return;
+  var list = palItems();
+  if (e.key === 'ArrowDown') { e.preventDefault(); S.palIdx = Math.min(S.palIdx + 1, list.length - 1); paintPal(); }
+  if (e.key === 'ArrowUp') { e.preventDefault(); S.palIdx = Math.max(S.palIdx - 1, 0); paintPal(); }
+  if (e.key === 'Enter') { e.preventDefault(); var it = list[S.palIdx]; closePal(); if (it) it.run(); }
+});
+
+addEventListener('beforeunload', function (e) {
+  if (S.dirty > 0 && S.view === 'dash') { e.preventDefault(); e.returnValue = ''; }
+});
+
+/* ----------------------------------------------------------------- start */
+(function boot() {
+  var me = API.me();
+  if (!me || !API.token()) return render();
+  S.me = me; S.editing = me.slug;
+  API.call('getPage', {}).then(function (d) {
+    S.page = d.page; S.view = 'dash';
+    if (me.role === 'owner') API.call('listMembers', {}).then(function (r) { S.members = r.members; });
+    render();
+  }).catch(function () { API.logout(); render(); });
+})();
+</script>
+</body>
+</html>

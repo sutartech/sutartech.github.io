@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sutar Tech</title>
+<link rel="preconnect" href="https://script.google.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,400;6..72,500&display=swap" rel="stylesheet">
+<style>
+  html,body{margin:0;padding:0;background:#FBF7F1}
+  body{font-family:"Helvetica Neue",Helvetica,Arial,sans-serif;-webkit-font-smoothing:antialiased}
+  *{box-sizing:border-box}
+  a{color:#5B3FB8}
+  #root a[style]:hover{filter:brightness(.96)}
+  .sk{max-width:440px;margin:0 auto;padding:38px 20px;display:flex;flex-direction:column;align-items:center;gap:18px}
+  .sk i{display:block;background:#EFE7DA;border-radius:8px;animation:p 1.2s ease-in-out infinite}
+  @keyframes p{0%,100%{opacity:1}50%{opacity:.55}}
+  @media (prefers-reduced-motion:reduce){.sk i{animation:none}}
+  .msg{max-width:420px;margin:70px auto;text-align:center;color:#5C544B;font-size:15px;line-height:1.6;padding:0 20px}
+  .msg h1{font-family:Newsreader,Georgia,serif;font-weight:500;font-size:28px;color:#221E1A;margin:0 0 10px}
+</style>
+</head>
+<body>
+
+<main id="root" aria-busy="true">
+  <div class="sk">
+    <i style="width:96px;height:96px;border-radius:50%"></i>
+    <i style="width:180px;height:26px"></i>
+    <i style="width:130px;height:14px"></i>
+    <i style="width:100%;height:46px"></i>
+    <i style="width:100%;height:46px"></i>
+  </div>
+</main>
+
+<script src="/assets/api.js"></script>
+<script src="/assets/common.js"></script>
+<script>
+/* Catch-all member page.
+   GitHub Pages serves this file for ANY path that has no real file, so
+   /meera, /meera/prices, /anyone-at-all all land here and render from the
+   sheet. No folder, no commit, no file per member — inviting someone in the
+   dashboard is the whole job.
+
+   Trade-off: the HTTP status is 404, so search engines won't index these.
+   If a member needs to rank on Google, give that one a real folder with a
+   copy of sarada/index.html — real folders always win over this fallback. */
+
+var parts = location.pathname.replace(/^\/+|\/+$/g, '').split('/');
+var SLUG = parts[0] || '';
+var PATH = parts.slice(1).join('/');
+var root = document.getElementById('root');
+
+function notFound(msg) {
+  root.innerHTML = '<div class="msg"><h1>Page not found</h1><p>' + ST.esc(msg)
+    + '</p><p style="margin-top:22px"><a href="/">All member pages</a></p></div>';
+  root.setAttribute('aria-busy', 'false');
+}
+
+function paint(page) {
+  var sub = PATH ? (page.pages || []).filter(function (p) { return p.path === PATH; })[0] : null;
+  if (PATH && !sub) return notFound('There is no “' + PATH + '” page under /' + SLUG + '.');
+
+  document.body.style.background = ST.theme(page).bg;
+  var pf = page.profile || {};
+
+  if (sub) {
+    var t = ST.theme(page);
+    document.title = sub.title + ' — ' + (pf.name || SLUG);
+    root.innerHTML = '<div style="max-width:620px;margin:0 auto;padding:44px 22px 70px">'
+      + '<a href="/' + ST.esc(SLUG) + '/" style="font-size:13px;text-decoration:none;color:' + t.muted + '">← ' + ST.esc(pf.name || SLUG) + '</a>'
+      + '<h1 style="font-family:Newsreader,Georgia,serif;font-weight:500;font-size:30px;line-height:1.15;margin:14px 0 18px;color:' + t.ink + '">'
+      + ST.esc(sub.title) + '</h1>'
+      + '<div style="font-size:15px;line-height:1.7;color:' + t.body + ';white-space:pre-wrap;text-wrap:pretty">'
+      + ST.esc(sub.body || 'This page has no content yet.') + '</div></div>';
+  } else {
+    document.title = (pf.name || SLUG) + (pf.headline ? ' — ' + pf.headline : '');
+    root.innerHTML = ST.renderPage(page, { avatar: '/' + SLUG + '/avatar.jpg' });
+  }
+  root.setAttribute('aria-busy', 'false');
+}
+
+if (!SLUG) {
+  notFound('No member was named in the address.');
+} else {
+  var KEY = 'pg_' + SLUG;
+  try { var c = localStorage.getItem(KEY); if (c) paint(JSON.parse(c)); } catch (e) {}
+
+  API.publicPage(SLUG).then(function (page) {
+    localStorage.setItem(KEY, JSON.stringify(page));
+    paint(page);
+  }).catch(function () {
+    if (root.getAttribute('aria-busy') === 'true') notFound('No member page exists at /' + SLUG + '.');
+  });
+
+  addEventListener('load', function () {
+    API.track('trackVisit', { slug: SLUG, path: PATH, ref: document.referrer || '' });
+  });
+  root.addEventListener('click', function (e) {
+    var a = e.target.closest('a[data-tap]');
+    if (a) API.track('trackTap', { slug: SLUG, label: a.getAttribute('data-tap') });
+  });
+}
+</script>
+</body>
+</html>
